@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <!-- 부트스트랩 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <title>팬명록</title>
+    <!-- meta 태그 -->
+    <meta property="og:title" content="Duck90s' 팬명록"/>
+    <meta property="og:description" content="윤하 이쁘당"/>
+    <meta property="og:image" content="{{ url_for('static', filename='smile.png') }}"/>
+    <!-- 파비콘 -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='smile.png') }}">
+    <!-- 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Jua', sans-serif;
+        }
+
+        .title {
+            width: 100%;
+            height: 300px;
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('http://billboard.co.kr/_common/SE2.8.2.O4259f59/upload/1576732951-32.jpg');
+            background-position: center 35%;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .post-box {
+            width: 95%;
+            max-width: 500px;
+            margin: 20px auto 20px auto;
+            box-shadow: 0px 0px 3px 0px black;
+            padding: 20px;
+        }
+
+        .post-box #comment {
+            height: 200px;
+            resize: none;
+        }
+
+        .post-box > button {
+            margin-top: 15px;
+        }
+
+        .comment-list {
+            width: 95%;
+            max-width: 500px;
+            margin: 20px auto 20px auto;
+        }
+
+        .comment-list > .card {
+            margin: 10px 0;
+        }
+    </style>
+    <!-- 날씨 정보 추가-->
+    <script>
+        $('document').ready(function () {
+            // 날씨 정보 가져오기
+            $.ajax({
+                type: "GET",
+                url: "http://spartacodingclub.shop/sparta_api/weather/seoul",
+                data: {},
+                success: function (response) {
+                    $('.title').append(`<p>현재 기온: ${response['temp']}도</p>`);
+                }
+            })
+            // 댓글 가져오기
+            $.ajax({
+                type: "GET",
+                url: "/comment",
+                data: {},
+                success: function (response) {
+                    response['comments'].forEach((item) => {
+                        $('.comment-list').append(`
+                             <div class="card">
+                                <div class="card-body">
+                                    <blockquote class="blockquote mb-0">
+                                        <p>${item['comment']}</p>
+                                        <footer class="blockquote-footer">${item['name']}</footer>
+                                    </blockquote>
+                                </div>
+                             </div>
+                        `)
+                    })
+                }
+            })
+        });
+
+        function save_comment() {
+            $.ajax({
+                type: "POST",
+                url: "/comment",
+                data: {name: $('#name').val(), comment: $('#comment').val()},
+                success: function (response) {
+                    console.log(response);
+                }
+            })
+            location.reload();
+        }
+    </script>
+
+</head>
+
+<body>
+<div class="title">
+    <h1>윤하 팬명록</h1>
+</div>
+<div class="post-box">
+    <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="name" placeholder="url">
+        <label for="name">닉네임</label>
+    </div>
+    <div class="form-floating">
+        <textarea class="form-control" placeholder="Leave a comment here" id="comment"></textarea>
+        <label for="comment">응원댓글</label>
+    </div>
+    <button onclick="save_comment()" type="button" class="btn btn-dark">응원 남기기</button>
+</div>
+<div class="comment-list">
+</div>
+</body>
+</html>
